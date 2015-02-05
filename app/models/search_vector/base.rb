@@ -5,7 +5,10 @@ class SearchVector::Base < ActiveRecord::Base
     return [] if (visible_results = visible_results_for(user)).empty?
 
     connection.execute(sanitize_sql_array [
-      "SELECT     id, #{ranking_algorithm} as rank, :query as query
+      "SELECT id,
+              #{ranking_algorithm} as rank,
+              :query as query,
+              #{blurb_algorithm} as blurb
        FROM (
           SELECT  #{resource_class_id}, search_vector
           FROM    #{table_name}
@@ -19,7 +22,7 @@ class SearchVector::Base < ActiveRecord::Base
   end
 
   def self.build_search_result(result)
-    SearchResult.new resource_class.find(result['id']), result['query'], result['rank']
+    SearchResult.new resource_class.find(result['id']), result['query'], result['rank'], result['blurb']
   end
 
   def self.sync_searchable!(searchable)
@@ -70,6 +73,10 @@ class SearchVector::Base < ActiveRecord::Base
 
   def self.ranking_algorithm
     raise NotImplementedError.new
+  end
+
+  def self.blurb_algorithm
+    "ts_headline(description, to_tsquery(:query))"
   end
 
   def self.visible_results_for(user)

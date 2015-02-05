@@ -1,6 +1,6 @@
 class SearchResultSerializer < ActiveModel::Serializer
   embed :ids, include: true
-  attributes :priority, :query, :result_id, :result_type
+  attributes :priority, :query, :result_id, :result_type, :blurb
 
   has_one :result, polymorphic: true
   has_one :proposal, serializer: MotionSerializer, root: 'proposals'

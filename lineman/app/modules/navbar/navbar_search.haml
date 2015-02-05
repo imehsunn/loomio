@@ -26,4 +26,4 @@
         %li.selector-list-header{ng-show: 'comments.length > 0'}
           %h3{translate: "navbar.search.comments"}
         %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in comments | orderBy: "priority"'}
-          %navbar_search_comment{comment: 'searchResult.result()'}
+          %navbar_search_comment{result: 'searchResult'}

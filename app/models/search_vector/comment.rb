@@ -18,6 +18,10 @@ class SearchVector::Comment < SearchVector::Base
     "ts_rank_cd(search_vector, :query)"
   end
 
+  def self.blurb_algorithm
+    "ts_headline(body, to_tsquery(:query))"
+  end
+
   def self.visibility_column
     :discussion_id
   end
