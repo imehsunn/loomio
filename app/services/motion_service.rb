@@ -4,7 +4,7 @@ class MotionService
     actor.ability.authorize! :create, motion
     return false unless motion.valid?
     motion.save!
-    SearchService.sync_search_vector! motion.discussion_id
+    SearchService.sync! motion.discussion_id
     DiscussionReader.for(discussion: motion.discussion, user: actor).follow!
     Events::NewMotion.publish!(motion)
   end
@@ -31,6 +31,11 @@ class MotionService
       if motion.closing_at_changed?
         Events::MotionCloseDateEdited.publish!(motion, actor)
       end
+
+      if motion.name_changed? || motion.description_changed?
+        SearchService.sync! motion.discussion_id
+      end
+
       motion.save
     else
       false

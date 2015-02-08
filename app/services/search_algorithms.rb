@@ -1,6 +1,6 @@
 class SearchAlgorithms
 
-  def self.sync_search_vector
+  def self.sync
     "INSERT INTO discussion_search_vectors (discussion_id, search_vector)
      SELECT      id, #{discussion_vector}
      FROM        discussions

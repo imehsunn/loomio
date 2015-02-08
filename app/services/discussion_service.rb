@@ -6,7 +6,7 @@ class DiscussionService
 
     actor.ability.authorize! :create, discussion
     discussion.save!
-    SearchService.sync_search_vector! discussion.id
+    SearchService.sync! discussion.id
     Events::NewDiscussion.publish!(discussion)
   end
 
@@ -30,6 +30,10 @@ class DiscussionService
 
     if discussion.description_changed?
       Events::DiscussionDescriptionEdited.publish!(discussion, actor)
+    end
+
+    if discussion.title_changed? || discussion.description_changed?
+      SearchService.sync! discussion.id
     end
 
     DiscussionReader.for(discussion: discussion, user: actor).follow!
