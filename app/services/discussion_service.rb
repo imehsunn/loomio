@@ -6,6 +6,7 @@ class DiscussionService
 
     actor.ability.authorize! :create, discussion
     discussion.save!
+    SearchService.sync_search_vector! discussion.id
     Events::NewDiscussion.publish!(discussion)
   end
 

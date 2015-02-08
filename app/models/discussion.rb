@@ -6,16 +6,6 @@ class Discussion < ActiveRecord::Base
   include ReadableUnguessableUrls
   include Translatable
 
-  def sync_search_vector
-    SearchVector.sync! id
-  end
-  handle_asynchronously :sync_search_vector
-  after_save :sync_search_vector
-
-  def self.rebuild_search_index!
-    all.each(&:sync_search_vector_without_delay)
-  end
-
   scope :archived, -> { where('archived_at is not null') }
   scope :published, -> { where(archived_at: nil, is_deleted: false) }
 

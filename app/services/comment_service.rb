@@ -21,6 +21,7 @@ class CommentService
     comment.attachment_ids = [comment.attachment_ids, comment.new_attachment_ids].compact.flatten
     comment.save!
     comment.discussion.update_attribute(:last_comment_at, comment.created_at)
+    SearchService.sync_search_vector! comment.discussion_id
     event = Events::NewComment.publish!(comment)
     if mark_as_read
       DiscussionReader.for(user: actor, discussion: comment.discussion).viewed!(comment.created_at)
