@@ -17,13 +17,5 @@
       %div{ng-hide: 'searching || noResultsFound()'}
         %li.selector-list-header{ng-show: 'discussions.length > 0'}
           %h3{translate: "navbar.search.discussions"}
-        %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in discussions | orderBy: "priority"'}
-          %navbar_search_discussion{discussion: 'searchResult.result()'}
-        %li.selector-list-header{ng-show: 'proposals.length > 0'}
-          %h3{translate: "navbar.search.proposals"}
-        %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in proposals | orderBy: "priority"'}
-          %navbar_search_proposal{proposal: 'searchResult.result()'}
-        %li.selector-list-header{ng-show: 'comments.length > 0'}
-          %h3{translate: "navbar.search.comments"}
-        %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in comments | orderBy: "priority"'}
-          %navbar_search_comment{result: 'searchResult'}
+        %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in searchResults | orderBy: "priority"'}
+          %navbar_search_result{result: 'searchResult'}

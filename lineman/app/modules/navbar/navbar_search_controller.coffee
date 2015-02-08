@@ -16,9 +16,6 @@ angular.module('loomioApp').controller 'NavbarSearchController', ($scope, UserAu
     if query?
       $scope.searching = true
       Records.search_results.fetchByFragment($scope.query).then (response) ->
+        $scope.searching = false
         $scope.searchResults = _.map response.search_results, (result) ->
           Records.search_results.initialize result
-        $scope.discussions = _.filter $scope.searchResults, (result) -> result.isDiscussion()
-        $scope.proposals   = _.filter $scope.searchResults, (result) -> result.isProposal()
-        $scope.comments    = _.filter $scope.searchResults, (result) -> result.isComment()
-        $scope.searching = false
