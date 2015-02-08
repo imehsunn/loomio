@@ -1,9 +1,5 @@
 angular.module('loomioApp').controller 'NavbarSearchController', ($scope, UserAuthService, Records, SearchResultModel) ->
   $scope.searchResults = []
-  $scope.discussions   = []
-  $scope.proposals     = []
-  $scope.comments      = []
-
   $scope.searching = false
 
   $scope.noResultsFound = ->

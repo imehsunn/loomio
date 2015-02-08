@@ -15,7 +15,7 @@
       %li.selector-list-item.search-loading{ng-show: 'searching', translate: 'navbar.search.loading'}
       %li.selector-list-item.no-results-found{ng-show: 'noResultsFound()', translate: 'navbar.search.no_results'}
       %div{ng-hide: 'searching || noResultsFound()'}
-        %li.selector-list-header{ng-show: 'discussions.length > 0'}
+        %li.selector-list-header{ng-show: 'searchResults'}
           %h3{translate: "navbar.search.discussions"}
-        %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in searchResults | orderBy: "priority"'}
+        %li.selector-list-item.media{ng-hide: 'searching', ng-repeat: 'searchResult in searchResults | orderBy:priority'}
           %navbar_search_result{result: 'searchResult'}
