@@ -37,6 +37,7 @@ class SearchAlgorithms
         LIMIT    :limit
      ) vectors
      INNER JOIN discussions ON discussions.id = vectors.discussion_id
+     WHERE      rank > 0
      ORDER BY   rank, created_at DESC"
   end
 
