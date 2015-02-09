@@ -42,6 +42,7 @@ describe API::SearchResultsController do
       search_for('find')
 
       expect(@discussion_ids).to include discussion.id
+      expect(@motion_ids).to include active_motion.id
       expect(@priorities).to include 0.4
     end
 
@@ -51,6 +52,7 @@ describe API::SearchResultsController do
       search_for('find')
 
       expect(@discussion_ids).to include discussion.id
+      expect(@motion_ids).to include active_motion.id
       expect(@priorities).to include 0.2
     end
 
@@ -60,6 +62,7 @@ describe API::SearchResultsController do
       search_for('find')
 
       expect(@discussion_ids).to include discussion.id
+      expect(@motion_ids).to include closed_motion.id
       expect(@priorities).to include 0.2
     end
 
@@ -69,15 +72,16 @@ describe API::SearchResultsController do
       search_for('find')
 
       expect(@discussion_ids).to include discussion.id
+      expect(@motion_ids).to include closed_motion.id
       expect(@priorities).to include 0.1
     end
 
     it "can find a discussion by comment body" do
       comment.update body: 'find me'
       SearchService.sync! comment.discussion_id
-      search_for('find')
-
+      result = search_for('find')
       expect(@discussion_ids).to include discussion.id
+      expect(@comment_ids).to include comment.id
       expect(@priorities).to include 0.1
     end
 
@@ -99,6 +103,8 @@ def search_for(term)
   JSON.parse(response.body).tap do |json|
     expect(json.keys).to include *(%w[search_results])
     @discussion_ids = fields_for(json, 'search_results', 'discussion').map { |d| d['id'].to_i }
+    @motion_ids     = fields_for(json, 'search_results', 'proposals').flatten.map { |p| p['id'].to_i }
+    @comment_ids    = fields_for(json, 'search_results', 'comments').flatten.map { |c| c['id'].to_i }
     @priorities     = fields_for(json, 'search_results', 'priority').map(&:to_f)
   end
 end
