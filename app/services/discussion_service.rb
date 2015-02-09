@@ -23,6 +23,8 @@ class DiscussionService
 
     return false unless discussion.valid?
 
+    update_search_vector = discussion.title_changed? || discussion.description_changed?
+
     if discussion.title_changed?
       Events::DiscussionTitleEdited.publish!(discussion, actor)
     end
@@ -32,10 +34,7 @@ class DiscussionService
     end
     discussion.save!
 
-    if discussion.title_changed? || discussion.description_changed?
-      SearchService.sync! discussion.id
-    end
-
+    SearchService.sync! discussion.id if update_search_vector
     DiscussionReader.for(discussion: discussion, user: actor).follow!
   end
 end

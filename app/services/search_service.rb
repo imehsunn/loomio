@@ -10,7 +10,7 @@ class SearchService
   end
 
   def self.rebuild_search_index!
-    sync_without_delay! Discussion.all.pluck :id
+    sync_without_delay! *Discussion.all.pluck(:id)
   end
 
   def self.search_for(query, user: nil, limit: 10)
