@@ -4,7 +4,7 @@ angular.module('loomioApp').factory 'BaseRecordsInterface', (RestfulClient) ->
 
     constructor: (recordStore) ->
       @recordStore = recordStore
-      @collection = @recordStore.db.addCollection(@model.plural)
+      @collection = @recordStore.db.addCollection(@model.plural, {indices: @model.indices})
       @restfulClient = new RestfulClient(@model.plural)
 
       @restfulClient.onSuccess = (response) =>

@@ -2,7 +2,7 @@ angular.module('loomioApp').factory 'DiscussionModel', (BaseModel) ->
   class DiscussionModel extends BaseModel
     @singular: 'discussion'
     @plural: 'discussions'
-    @indices: ['groupId']
+    @indices: ['groupId', 'authorId']
 
     setupViews: ->
       #@dynamicView('comments')
@@ -60,5 +60,5 @@ angular.module('loomioApp').factory 'DiscussionModel', (BaseModel) ->
       proposal.closedAt if proposal?
 
     reader: ->
-      _.first(@recordStore.discussion_readers.find(discussionId: @id))
+      _.first(@recordStore.discussionReaders.find(discussionId: @id))
 

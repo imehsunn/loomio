@@ -21,7 +21,7 @@ angular.module('loomioApp').factory 'BaseModel', ->
     baseInitialize: (data) ->
       _.each _.keys(data), (key) =>
         attributeName = _.camelCase(key)
-        this[attributeName] = data[key]
+        @[attributeName] = data[key]
         unless _.contains(@constructor.attributeNames, attributeName)
           @constructor.attributeNames.push attributeName
 

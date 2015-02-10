@@ -4,7 +4,7 @@ angular.module('loomioApp').factory 'EventModel', (BaseModel) ->
     @plural: 'events'
 
     membershipRequest: ->
-      @recordStore.membership_requests.find(@membershipRequestId)
+      @recordStore.membershipRequests.find(@membershipRequestId)
 
     discussion: ->
       @recordStore.discussions.find(@discussionId)
