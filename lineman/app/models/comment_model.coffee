@@ -2,7 +2,7 @@ angular.module('loomioApp').factory 'CommentModel', (BaseModel) ->
   class CommentModel extends BaseModel
     @singular: 'comment'
     @plural: 'comments'
-    @indexes: ['discussionId', 'authorId']
+    @indices: ['discussionId', 'authorId']
 
     initialize: (data) ->
       @baseInitialize(data)

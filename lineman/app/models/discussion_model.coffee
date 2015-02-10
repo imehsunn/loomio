@@ -2,8 +2,7 @@ angular.module('loomioApp').factory 'DiscussionModel', (BaseModel) ->
   class DiscussionModel extends BaseModel
     @singular: 'discussion'
     @plural: 'discussions'
-    @foreignKey: 'discussionId'
-    @indexes: ['groupId']
+    @indices: ['groupId']
 
     setupViews: ->
       #@dynamicView('comments')

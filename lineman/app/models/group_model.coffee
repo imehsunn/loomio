@@ -2,7 +2,7 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel) ->
   class GroupModel extends BaseModel
     @singular: 'group'
     @plural: 'groups'
-    @indexes: ['parentId']
+    @indices: ['parentId']
 
     setupViews: ->
       @discussionsView = @recordStore.discussions.collection.addDynamicView(@viewName())

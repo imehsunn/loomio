@@ -2,11 +2,12 @@ angular.module('loomioApp').factory 'BaseModel', ->
   class BaseModel
     @singular: 'undefinedSingular'
     @plural: 'undefinedPlural'
-    errors: {}
-    processing: false
-    attributeNames: []
+    @indices: []
+    @attributeNames: []
 
     constructor: (recordsInterface, data) ->
+      @errors = {}
+      @processing = false
       Object.defineProperty(@, 'recordsInterface', value: recordsInterface, enumerable: true)
       Object.defineProperty(@, 'recordStore', value: recordsInterface.recordStore, enumerable: true)
       Object.defineProperty(@, 'restfulClient', value: recordsInterface.restfulClient, enumerable: true)
@@ -18,10 +19,11 @@ angular.module('loomioApp').factory 'BaseModel', ->
       @baseInitialize(data)
 
     baseInitialize: (data) ->
-      _.each _.keys(data), (key) ->
+      _.each _.keys(data), (key) =>
         attributeName = _.camelCase(key)
         this[attributeName] = data[key]
-        @attributeNames.push attributeName
+        unless _.contains(@constructor.attributeNames, attributeName)
+          @constructor.attributeNames.push attributeName
 
     # copy camcelCase attributes to snake_case object for rails
     serialize: ->
