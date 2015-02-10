@@ -32,7 +32,11 @@ class Vote < ActiveRecord::Base
   after_save :update_motion_vote_counts
   after_destroy :update_motion_vote_counts
 
-  alias :author= :user=
+  alias_method :author=,      :user=
+  alias_method :proposal_id=, :motion_id=
+  alias_method :proposal_id,  :motion_id
+  alias_method :proposal,     :motion
+  alias_method :proposal=,    :motion=
 
   def author
     user

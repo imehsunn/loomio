@@ -180,6 +180,18 @@ class Discussion < ActiveRecord::Base
     end
   end
 
+  def refresh_last_sequence_id!
+    update_attribute(:last_sequence_id, self.lookup_last_sequence_id)
+  end
+
+  def lookup_last_sequence_id
+    Event.where(discussion_id: id).
+          where('sequence_id is not null').
+          order('sequence_id desc').
+          limit(1).
+          pluck(:sequence_id).first || 0
+  end
+
   private
 
   def refresh_last_comment_at!

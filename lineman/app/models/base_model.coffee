@@ -4,6 +4,7 @@ angular.module('loomioApp').factory 'BaseModel', ->
     @plural: 'undefinedPlural'
     errors: {}
     processing: false
+    attributeNames: []
 
     constructor: (recordsInterface, data) ->
       Object.defineProperty(@, 'recordsInterface', value: recordsInterface, enumerable: true)
@@ -12,7 +13,25 @@ angular.module('loomioApp').factory 'BaseModel', ->
       @initialize(data)
       @setupViews() if @setupViews? and @id?
 
-    initialize: ->
+    #copy rails snake_case hash, into camelCase object properties
+    initialize: (data) ->
+      @baseInitialize(data)
+
+    baseInitialize: (data) ->
+      _.each _.keys(data), (key) ->
+        attributeName = _.camelCase(key)
+        this[attributeName] = data[key]
+        @attributeNames.push attributeName
+
+    # copy camcelCase attributes to snake_case object for rails
+    serialize: ->
+      @baseSerialize()
+
+    baseSerialize: ->
+      data = {}
+      _.each @attributeNames, (attributeName) ->
+        data[_.snakeCase(attributeName)] = this[attributeName]
+      data
 
     setupViews: ->
 

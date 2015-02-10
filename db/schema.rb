@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150204230136) do
+ActiveRecord::Schema.define(version: 20150209010926) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,6 +212,7 @@ ActiveRecord::Schema.define(version: 20150204230136) do
     t.string   "iframe_src"
     t.datetime "last_activity_at"
     t.integer  "motions_count",    default: 0
+    t.integer  "last_sequence_id", default: 0,     null: false
   end
 
   add_index "discussions", ["author_id"], name: "index_discussions_on_author_id", using: :btree

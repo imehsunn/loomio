@@ -12,6 +12,7 @@ class Event < ActiveRecord::Base
   belongs_to :user
 
   after_create :touch_discussion_last_activity_at
+  after_create :update_discussion_last_sequence_id
 
   validates_inclusion_of :kind, :in => KINDS
   validates_presence_of :eventable
@@ -50,6 +51,12 @@ class Event < ActiveRecord::Base
   def touch_discussion_last_activity_at
     if discussion.present?
       discussion.update_attribute(:last_activity_at, created_at)
+    end
+  end
+
+  def update_discussion_last_sequence_id
+    if discussion.present?
+      discussion.update_attribute(:last_sequence_id, sequence_id)
     end
   end
 end
