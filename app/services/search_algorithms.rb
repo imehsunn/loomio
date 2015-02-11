@@ -26,12 +26,12 @@ class SearchAlgorithms
   def self.search(visible_ids = [])
     "SELECT id,
             rank,
-            ts_headline(discussions.description, to_tsquery(:query)) as blurb,
+            ts_headline(discussions.description, plainto_tsquery(:query)) as blurb,
             :query as query
      FROM (
-        SELECT   discussion_id, search_vector, ts_rank_cd(search_vector, :query) as rank
+        SELECT   discussion_id, search_vector, ts_rank_cd(search_vector, plainto_tsquery(:query)) as rank
         FROM     discussion_search_vectors
-        WHERE    search_vector @@ to_tsquery(:query)
+        WHERE    search_vector @@ plainto_tsquery(:query)
         AND      discussion_id IN (#{visible_ids.join(',')})
         ORDER BY rank DESC
         LIMIT    :limit
@@ -42,19 +42,19 @@ class SearchAlgorithms
   end
 
   def self.relevant_motions
-    "SELECT   id, name, ts_headline(description, to_tsquery(:query)) as blurb
+    "SELECT   id, name, ts_headline(description, plainto_tsquery(:query)) as blurb
      FROM     motions
      WHERE    motions.discussion_id = :id
-     AND      #{motion_vector} @@ to_tsquery(:query)
+     AND      #{motion_vector} @@ plainto_tsquery(:query)
      ORDER BY created_at DESC
      LIMIT    :limit"
   end
 
   def self.relevant_comments
-    "SELECT   id, ts_headline(body, to_tsquery(:query)) as blurb
+    "SELECT   id, ts_headline(body, plainto_tsquery(:query)) as blurb
      FROM     comments
      WHERE    comments.discussion_id = :id
-     AND      #{comment_vector} @@ to_tsquery(:query)
+     AND      #{comment_vector} @@ plainto_tsquery(:query)
      ORDER BY created_at DESC
      LIMIT    :limit"
   end
