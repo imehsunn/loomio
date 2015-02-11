@@ -40,7 +40,7 @@ describe Discussion do
     end
 
     it "resets last_comment_at" do
-      discussion.should_receive(:refresh_last_comment_at!)
+      discussion.should_receive(:reset_last_comment_at!)
     end
 
     it "calls reset_counts on all discussion readers" do

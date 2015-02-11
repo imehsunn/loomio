@@ -25,7 +25,7 @@ angular.module('loomioApp').factory 'BaseRecordsInterface', (RestfulClient) ->
         existingRecord
       else
         record = new @model(@, data)
-        @collection.insert(record) if data.id?
+        @collection.insert(record)
         record
 
     findOrFetchByKey: (key) ->

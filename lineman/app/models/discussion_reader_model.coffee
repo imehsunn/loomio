@@ -11,3 +11,8 @@ angular.module('loomioApp').factory 'DiscussionReaderModel', (BaseModel) ->
       data = @baseSerialize()
       data.discussion_id = @id
       data
+
+    markItemAsRead: (item) ->
+      @lastReadSequenceId = item.sequenceId
+      @lastReadAt = item.createdAt
+

@@ -8,9 +8,9 @@ angular.module('loomioApp').factory 'BaseModel', ->
     constructor: (recordsInterface, data) ->
       @errors = {}
       @processing = false
-      Object.defineProperty(@, 'recordsInterface', value: recordsInterface, enumerable: true)
-      Object.defineProperty(@, 'recordStore', value: recordsInterface.recordStore, enumerable: true)
-      Object.defineProperty(@, 'restfulClient', value: recordsInterface.restfulClient, enumerable: true)
+      Object.defineProperty(@, 'recordsInterface', value: recordsInterface, enumerable: false)
+      Object.defineProperty(@, 'recordStore', value: recordsInterface.recordStore, enumerable: false)
+      Object.defineProperty(@, 'restfulClient', value: recordsInterface.restfulClient, enumerable: false)
       @initialize(data)
       @setupViews() if @setupViews? and @id?
 

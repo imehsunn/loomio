@@ -60,5 +60,8 @@ angular.module('loomioApp').factory 'DiscussionModel', (BaseModel) ->
       proposal.closedAt if proposal?
 
     reader: ->
-      _.first(@recordStore.discussionReaders.find(discussionId: @id))
+      @recordStore.discussionReaders.find(@id)
+
+    unreadItemsCount: ->
+      @itemsCount - @reader().readItemsCount
 

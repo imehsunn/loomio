@@ -20,7 +20,7 @@ describe 'DiscussionModel', ->
     author = recordStore.users.initialize(id: 1, name: 'Sam')
     event = recordStore.events.initialize(id: 1, sequence_id: 1, discussion_id: 1)
     otherEvent = recordStore.events.initialize(id: 2, sequence_id: 2, discussion_id: 2)
-    discussionReader = recordStore.discussion_readers.initialize(discussion_id: 1)
+    discussionReader = recordStore.discussionReaders.initialize(discussion_id: 1)
 
   describe 'author()', ->
     it 'returns the discussion author', ->
@@ -59,5 +59,4 @@ describe 'DiscussionModel', ->
 
   describe 'reader', ->
     it "returns the discussion reader associated with this discussion", ->
-      console.log recordStore.discussion_readers.find()
       expect(discussion.reader()).toBe(discussionReader)

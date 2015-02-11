@@ -166,8 +166,20 @@ class Discussion < ActiveRecord::Base
   end
 
   def comment_deleted!
-    refresh_last_comment_at!
+    Discussion.transaction do
+      Discussion.decrement_counter(:items_count, 1)
+      Discussion.decrement_counter(:comments_count, 1)
+      reset_last_comment_at
+      reset_last_activity_at
+      reset_
+    end
     discussion_readers.each(&:reset_counts!)
+    #decrement discussion.items_count
+    #decrement discussion.comments_count
+    #reset first and last sequence ids
+    #discussion.reset_last_comment_at!
+    #discussion.reset_last_activity_at!
+    #reset all discussion_readers
   end
 
   def public?
@@ -180,8 +192,17 @@ class Discussion < ActiveRecord::Base
     end
   end
 
-  def refresh_last_sequence_id!
-    update_attribute(:last_sequence_id, self.lookup_last_sequence_id)
+  def reset_first_and_last_sequence_ids!
+    update_attribute(:first_sequence_id, lookup_first_sequence_id)
+    update_attribute(:last_sequence_id,  lookup_last_sequence_id)
+  end
+
+  def lookup_first_sequence_id
+    Event.where(discussion_id: id).
+          where('sequence_id is not null').
+          order("sequence_id asc").
+          limit(1).
+          pluck(:sequence_id).first || 0
   end
 
   def lookup_last_sequence_id
@@ -194,8 +215,8 @@ class Discussion < ActiveRecord::Base
 
   private
 
-  def refresh_last_comment_at!
-    if comments.exists?
+  def reset_last_comment_at!
+    if comments.any?
       last_comment_time = most_recent_comment.created_at
     else
       last_comment_time = created_at
