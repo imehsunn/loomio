@@ -22,7 +22,6 @@ class Comment < ActiveRecord::Base
   validate :parent_comment_belongs_to_same_discussion
 
   after_initialize :set_defaults
-  after_destroy :send_discussion_comment_deleted!
 
   default_scope { includes(:user).includes(:attachments).includes(:discussion) }
 

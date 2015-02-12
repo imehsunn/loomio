@@ -165,21 +165,35 @@ class Discussion < ActiveRecord::Base
     comments.order("created_at DESC").first
   end
 
-  def comment_deleted!
-    Discussion.transaction do
-      Discussion.decrement_counter(:items_count, 1)
-      Discussion.decrement_counter(:comments_count, 1)
-      reset_last_comment_at
-      reset_last_activity_at
-      reset_
+  def item_created!(item)
+    #update count and last_activity_at
+    self.items_count += 1
+    self.last_activity_at = item.created_at
+
+    if item.kind == 'new_comment'
+      self.last_comment_at = item.created_at
+      self.comments_count += 1
     end
+
+    # update first and last sequence ids
+    if self.first_sequence_id == 0
+      self.first_sequence_id = item.sequence_id
+    end
+    self.last_sequence_id = item.sequence_id
+
+    self.save!(validate: false)
+  end
+
+  def item_destroyed!
+    # rather than decerementing, I'm spending cycles doing a recount.
+    self.items_count = items.count
+    self.comments_count = comments.count
+    self.first_sequence_id = lookup_first_sequence_id
+    self.last_sequence_id = lookup_last_sequence_id
+    self.last_comment_at = lookup_last_comment_at
+    self.last_activity_at = lookup_last_activity_at
+    self.save!(validate: false)
     discussion_readers.each(&:reset_counts!)
-    #decrement discussion.items_count
-    #decrement discussion.comments_count
-    #reset first and last sequence ids
-    #discussion.reset_last_comment_at!
-    #discussion.reset_last_activity_at!
-    #reset all discussion_readers
   end
 
   def public?
@@ -192,9 +206,19 @@ class Discussion < ActiveRecord::Base
     end
   end
 
+  def reset_items_and_comments_counts!
+    update_attribute(:items_count, items.count)
+    update_attribute(:comments_count, comments.count)
+  end
+
   def reset_first_and_last_sequence_ids!
     update_attribute(:first_sequence_id, lookup_first_sequence_id)
     update_attribute(:last_sequence_id,  lookup_last_sequence_id)
+  end
+
+  def reset_last_comment_and_activity_at!
+    update_attribute(:last_comment_at, lookup_last_comment_at)
+    update_attribute(:last_activity_at, lookup_last_activity_at)
   end
 
   def lookup_first_sequence_id
@@ -217,16 +241,11 @@ class Discussion < ActiveRecord::Base
     most_recent_comment.created_at
   end
 
-  def reset_last_comment_at!
-    update_attribute(:last_comment_at, lookup_last_comment_at)
-  end
-
   def lookup_last_activity_at
     items.order('id desc').last.try(:created_at)
   end
+
   private
-
-
   def private_is_not_nil
     errors.add(:private, "Please select a privacy") if self[:private].nil?
   end
@@ -240,18 +259,5 @@ class Discussion < ActiveRecord::Base
     if self.private? and group.public_discussions_only?
       errors.add(:private, "must be public in this group")
     end
-  end
-
-  def set_last_comment_at
-    self.last_activity_at ||= Time.now
-    self.last_comment_at ||= Time.now
-  end
-
-  def fire_edit_title_event(user)
-    Events::DiscussionTitleEdited.publish!(self, user)
-  end
-
-  def fire_edit_description_event(user)
-    Events::DiscussionDescriptionEdited.publish!(self, user)
   end
 end

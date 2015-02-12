@@ -11,8 +11,8 @@ class Event < ActiveRecord::Base
   belongs_to :discussion, counter_cache: :items_count
   belongs_to :user
 
-  after_create :touch_discussion_last_activity_at
-  after_create :update_discussion_last_sequence_id
+  after_create :call_discussion_item_created
+  after_destroy :call_discussion_item_destroyed
 
   validates_inclusion_of :kind, :in => KINDS
   validates_presence_of :eventable
@@ -48,15 +48,11 @@ class Event < ActiveRecord::Base
 
   private
 
-  def touch_discussion_last_activity_at
-    if discussion.present?
-      discussion.update_attribute(:last_activity_at, created_at)
-    end
+  def call_discussion_item_created
+    discussion.item_created!(self) if discussion.present?
   end
 
-  def update_discussion_last_sequence_id
-    if discussion.present?
-      discussion.update_attribute(:last_sequence_id, sequence_id)
-    end
+  def call_discussion_item_destroyed
+    discussion.item_destroyed! if discussion.present?
   end
 end
