@@ -29,7 +29,7 @@ class Vote < ActiveRecord::Base
 
   before_create :age_previous_votes, :associate_previous_vote
 
-  after_save :update_motion_vote_counts
+  after_create :update_motion_vote_counts
   after_destroy :update_motion_vote_counts
 
   # alias_method does not work for the following obvious methods
@@ -109,8 +109,9 @@ class Vote < ActiveRecord::Base
   end
 
   def age_previous_votes
+    raise "only for new votes" if persisted?
     Vote.transaction do
-      motion.votes.order('age desc').each do |vote|
+      motion.votes.where(user_id: user_id).order('age desc').each do |vote|
         vote.update_attribute(:age, vote.age + 1)
       end
     end
