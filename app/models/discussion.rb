@@ -213,16 +213,19 @@ class Discussion < ActiveRecord::Base
           pluck(:sequence_id).first || 0
   end
 
-  private
+  def lookup_last_comment_at
+    most_recent_comment.created_at
+  end
 
   def reset_last_comment_at!
-    if comments.any?
-      last_comment_time = most_recent_comment.created_at
-    else
-      last_comment_time = created_at
-    end
-    update_attribute(:last_comment_at, last_comment_time)
+    update_attribute(:last_comment_at, lookup_last_comment_at)
   end
+
+  def lookup_last_activity_at
+    items.order('id desc').last.try(:created_at)
+  end
+  private
+
 
   def private_is_not_nil
     errors.add(:private, "Please select a privacy") if self[:private].nil?
