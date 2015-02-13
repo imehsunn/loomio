@@ -32,4 +32,24 @@ describe UserMailer do
       @mail.body.encoded.should match("http://localhost:3000/g/#{@group.key}")
     end
   end
+
+  context '#added_to_group' do 
+    before do
+      @user    = double(:user, name: 'Wayne G', email: 'w_recipient@g.com', name_and_email: nil)  
+      @inviter = double(:user, name: 'invite', email: 'inviter@h.com', name_and_email: nil) 
+      @group   = create(:group)
+      @group.update_attribute(:full_name, 'ParentName - SubgroupName')
+      @message = 'blah blah' 
+    end
+      
+    it 'uses group.full_name in the email subject' do
+      mail_object = UserMailer.added_to_group(user: @user, inviter: @inviter, group: @group, message: @message)      
+      mail_object.subject.should include @group.full_name
+    end
+
+    it 'uses group.full_name in the email body' do
+      mail_object = UserMailer.added_to_group(user: @user, inviter: @inviter, group: @group, message: @message)      
+      mail_object.body.encoded.should include @group.full_name
+    end
+  end
 end
