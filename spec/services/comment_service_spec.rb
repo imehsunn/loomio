@@ -1,12 +1,6 @@
 require 'rails_helper'
 
 describe "CommentService" do
-  describe "create comment" do
-    # ensure that items count and comments count are incremented
-    # ensure that last_activity etc are all managed properly
-    # last sequence too
-  end
-
   describe "destroy comment" do
     # this is the first/main method we call to delete a comment
     # after it has been called

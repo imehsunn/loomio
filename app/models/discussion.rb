@@ -65,8 +65,6 @@ class Discussion < ActiveRecord::Base
   delegate :name_and_email, to: :author, prefix: :author
   delegate :locale, to: :author
 
-  before_create :set_last_comment_at
-
   def published_at
     created_at
   end
@@ -165,7 +163,7 @@ class Discussion < ActiveRecord::Base
     comments.order("created_at DESC").first
   end
 
-  def item_created!(item)
+  def thread_item_created!(item)
     #update count and last_activity_at
     self.items_count += 1
     self.last_activity_at = item.created_at
@@ -184,8 +182,13 @@ class Discussion < ActiveRecord::Base
     self.save!(validate: false)
   end
 
-  def item_destroyed!
+  def thread_item_destroyed!
     # rather than decerementing, I'm spending cycles doing a recount.
+    reset_managed_values!
+    true
+  end
+
+  def reset_managed_values!
     self.items_count = items.count
     self.comments_count = comments.count
     self.first_sequence_id = lookup_first_sequence_id
@@ -206,21 +209,6 @@ class Discussion < ActiveRecord::Base
     end
   end
 
-  def reset_items_and_comments_counts!
-    update_attribute(:items_count, items.count)
-    update_attribute(:comments_count, comments.count)
-  end
-
-  def reset_first_and_last_sequence_ids!
-    update_attribute(:first_sequence_id, lookup_first_sequence_id)
-    update_attribute(:last_sequence_id,  lookup_last_sequence_id)
-  end
-
-  def reset_last_comment_and_activity_at!
-    update_attribute(:last_comment_at, lookup_last_comment_at)
-    update_attribute(:last_activity_at, lookup_last_activity_at)
-  end
-
   def lookup_first_sequence_id
     Event.where(discussion_id: id).
           where('sequence_id is not null').
@@ -238,7 +226,7 @@ class Discussion < ActiveRecord::Base
   end
 
   def lookup_last_comment_at
-    most_recent_comment.created_at
+    most_recent_comment.try(:created_at)
   end
 
   def lookup_last_activity_at

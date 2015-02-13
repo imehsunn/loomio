@@ -8,16 +8,16 @@ class Event < ActiveRecord::Base
 
   has_many :notifications, dependent: :destroy
   belongs_to :eventable, polymorphic: true
-  belongs_to :discussion, counter_cache: :items_count
+  belongs_to :discussion
   belongs_to :user
 
-  after_create :call_discussion_item_created
-  after_destroy :call_discussion_item_destroyed
+  after_create :call_thread_item_created
+  after_destroy :call_thread_item_destroyed
+
+  after_create :publish_event
 
   validates_inclusion_of :kind, :in => KINDS
   validates_presence_of :eventable
-
-  after_create :publish_event
 
   acts_as_sequenced scope: :discussion_id, column: :sequence_id, skip: lambda {|e| e.discussion.nil? }
 
@@ -48,11 +48,11 @@ class Event < ActiveRecord::Base
 
   private
 
-  def call_discussion_item_created
-    discussion.item_created!(self) if discussion.present?
+  def call_thread_item_created
+    discussion.thread_item_created!(self) if discussion_id.present?
   end
 
-  def call_discussion_item_destroyed
-    discussion.item_destroyed! if discussion.present?
+  def call_thread_item_destroyed
+    discussion.thread_item_destroyed! if discussion_id.present?
   end
 end

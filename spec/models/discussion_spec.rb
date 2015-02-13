@@ -34,23 +34,6 @@ describe Discussion do
     it {should_not include non_member }
   end
 
-  describe ".comment_deleted!" do
-    after do
-      discussion.comment_deleted!
-    end
-
-    it "resets last_comment_at" do
-      discussion.should_receive(:reset_last_comment_at!)
-    end
-
-    it "calls reset_counts on all discussion readers" do
-      dr = DiscussionReader.for(discussion: discussion, user: discussion.author)
-      dr.viewed!
-      discussion.stub(:discussion_readers).and_return([dr])
-      dr.should_receive(:reset_counts!)
-    end
-  end
-
   describe "archive!" do
     let(:discussion) { create :discussion }
 
@@ -289,5 +272,56 @@ describe Discussion do
       end
       it {should have(1).errors_on(:private)}
     end
+  end
+
+  describe "creating and destroying thread items" do
+    let(:discussion) { create :discussion }
+
+    describe "new discussion" do
+      it "has the right values to begin with" do
+        expect(discussion.items_count).to be 0
+        expect(discussion.comments_count).to be 0
+        expect(discussion.last_activity_at).to be nil
+        expect(discussion.last_comment_at).to be nil
+        expect(discussion.first_sequence_id).to be 0
+        expect(discussion.last_sequence_id).to be 0
+      end
+    end
+
+    describe "create comment" do
+      # ensure that items count and comments count are incremented
+      # ensure that last_activity etc are all managed properly
+      # last sequence too
+      before do 
+        @comment = build(:comment, discussion: discussion)
+        @event = CommentService.create(comment: @comment, actor: discussion.author)
+        discussion.reload
+      end
+      it "increments items_count" do
+        expect(discussion.items_count).to be 1
+      end
+
+      it "increments comments_count" do
+        expect(discussion.comments_count).to be 1
+      end
+
+      it "updates last_activity_at" do
+        expect(discussion.last_activity_at).to eq @comment.created_at
+      end
+
+      it "updates last_comment_at" do
+        expect(discussion.last_comment_at).to eq @comment.created_at
+      end
+
+      it "updates last_sequence_id" do
+        expect(discussion.last_sequence_id).to be @event.sequence_id
+      end
+
+      it "updates first_sequence_id" do
+        expect(discussion.first_sequence_id).to be @event.sequence_id
+        expect(discussion.last_sequence_id).to be @event.sequence_id
+      end
+    end
+
   end
 end

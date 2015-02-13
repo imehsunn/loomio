@@ -89,7 +89,8 @@ class DiscussionReader < ActiveRecord::Base
   def reset_counts!
     self.read_comments_count = count_read_comments(last_read_at)
     self.read_items_count = count_read_items(last_read_at)
-    self.save!
+    self.last_read_sequence_id = lookup_last_read_item.try(:sequence_id) || 0
+    self.save!(validate: false)
   end
 
   def first_unread_page
@@ -103,6 +104,13 @@ class DiscussionReader < ActiveRecord::Base
     else
       (read_items_count.to_f / per_page).ceil
     end
+  end
+
+  def lookup_last_read_item
+    discussion.
+      items.
+      where('created_at <= ?', last_read_at).
+      order('created_at desc').first
   end
 
   private
