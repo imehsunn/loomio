@@ -19,6 +19,24 @@ describe EmailActionsController do
     end
   end
 
+  describe "follow_discussion" do
+    before do
+      @user = FactoryGirl.create(:user)
+      @group = FactoryGirl.create(:group)
+      @group.add_member!(@user)
+
+      @discussion = FactoryGirl.build(:discussion, group: @group)
+      DiscussionService.create(discussion: @discussion, actor: @user)
+      DiscussionReader.for(discussion: @discussion, user: @user).unfollow!
+    end
+
+    it 'follows the discussion' do
+      DiscussionReader.for(discussion: @discussion, user: @user).following?.should be false
+      get :follow_discussion, discussion_id: @discussion.id, unsubscribe_token: @user.unsubscribe_token
+      DiscussionReader.for(discussion: @discussion, user: @user).following?.should be true
+    end
+  end
+
   describe "mark_discussion_as_read" do
     before do
       @user = FactoryGirl.create(:user)
